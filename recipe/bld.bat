@@ -42,15 +42,24 @@ set UNIX_LIBRARY_PREFIX=%LIBRARY_PREFIX:\=/%
 set UNIX_LIBRARY_BIN=%LIBRARY_BIN:\=/%
 set UNIX_SP_DIR=%SP_DIR:\=/%
 set UNIX_SRC_DIR=%SRC_DIR:\=/%
+set UNIX_THIS_DIR=%cd:\=/%
 
+git clone https://github.com/opencv/opencv_3rdparty.git -c core.autocrlf=false
+pushd opencv_3rdparty
+git checkout ffmpeg/master_20150703
+popd
 
-cmake .. -LAH -G "NMake Makefiles"                                                  ^
+set OPENCV_FFMPEG_URL=file:///%UNIX_THIS_DIR%/opencv_3rdparty/ffmpeg/
+
+cmake .. -LAH -G "Ninja"                                                            ^
     -DWITH_EIGEN=1                                                                  ^
     -DBUILD_TESTS=0                                                                 ^
     -DBUILD_DOCS=0                                                                  ^
     -DBUILD_PERF_TESTS=0                                                            ^
     -DBUILD_ZLIB=0                                                                  ^
     -DBUILD_opencv_bioinspired=0                                                    ^
+    -DBUILD_opencv_hdf=0                                                            ^
+    -DBUILD_opencv_matlab=0                                                         ^
     -DBUILD_TIFF=0                                                                  ^
     -DBUILD_PNG=0                                                                   ^
     -DBUILD_OPENEXR=1                                                               ^
@@ -59,14 +68,13 @@ cmake .. -LAH -G "NMake Makefiles"                                              
     -DWITH_CUDA=0                                                                   ^
     -DWITH_OPENCL=0                                                                 ^
     -DWITH_OPENNI=0                                                                 ^
-    -DWITH_FFMPEG=0                                                                 ^
+    -DWITH_FFMPEG=1                                                                 ^
     -DWITH_VTK=0                                                                    ^
     -DINSTALL_C_EXAMPLES=0                                                          ^
     -DOPENCV_EXTRA_MODULES_PATH=%UNIX_SRC_DIR%/opencv_contrib-%PKG_VERSION%/modules ^
+    -DOPENCV_FFMPEG_URL=%OPENCV_FFMPEG_URL%                                         ^
     -DCMAKE_BUILD_TYPE="Release"                                                    ^
     -DCMAKE_INSTALL_PREFIX=%UNIX_LIBRARY_PREFIX%                                    ^
-    -DEXECUTABLE_OUTPUT_PATH=%UNIX_LIBRARY_BIN%                                     ^
-    -DLIBRARY_OUTPUT_PATH=%UNIX_LIBRARY_BIN%                                        ^
     -DPYTHON_EXECUTABLE=""                                                          ^
     -DPYTHON_INCLUDE_DIR=""                                                         ^
     -DPYTHON_PACKAGES_PATH=""                                                       ^
@@ -86,7 +94,7 @@ cmake .. -LAH -G "NMake Makefiles"                                              
     -DPYTHON3_PACKAGES_PATH=""
 if errorlevel 1 exit 1
 
-cmake .. -LAH -G "NMake Makefiles"                                                  ^
+cmake .. -LAH -G "Ninja"                                                            ^
     -DPYTHON_EXECUTABLE=%UNIX_PREFIX%/python                                        ^
     -DPYTHON_INCLUDE_DIR=%UNIX_PREFIX%/include                                      ^
     -DPYTHON_PACKAGES_PATH=%UNIX_SP_DIR%                                            ^
@@ -100,7 +108,7 @@ cmake .. -LAH -G "NMake Makefiles"                                              
     -DPYTHON%PY_MAJOR%_PACKAGES_PATH=%UNIX_SP_DIR%
 if errorlevel 1 exit 1
 
-cmake --build . --target INSTALL --config Release
+cmake --build . --target install --config Release
 if errorlevel 1 exit 1
 
 if "%ARCH%" == "32" ( set "OPENCV_ARCH=86")

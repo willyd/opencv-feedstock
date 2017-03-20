@@ -36,6 +36,7 @@ requirements:
     - libtiff 4.0.*
     - libpng >=1.6.21,<1.7
     - msinttypes            # [win and py<35]
+    - ninja                 # [win]
 
   run:
     - python
